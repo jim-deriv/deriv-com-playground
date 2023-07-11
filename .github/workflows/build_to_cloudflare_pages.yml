@@ -20,7 +20,7 @@ jobs:
         run: npm ci
       
       - name: Build project
-        run: npm build
+        run: npm run build
         
       - name: Publish to Cloudflare Pages
         uses: cloudflare/pages-action@v1
