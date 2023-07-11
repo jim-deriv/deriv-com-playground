@@ -1,4 +1,4 @@
-name: Build to Vercel
+name: Build to Cloudflare Pages
 
 permissions: write-all
 
@@ -6,13 +6,8 @@ on:
   pull_request:
     types: [opened, synchronize]
 
-env:
-  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-  NODE_OPTIONS: "--max-old-space-size=8192"
-
 jobs:
-  build_to_vercel:
+  build_to_cloudflare_pages:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout to repo
@@ -27,31 +22,35 @@ jobs:
       - name: Pull Vercel preview information
         run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
         
-      - name: Build artifacts
-        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build project
+        run: npm build
         
-      - name: Deploy artifacts to Vercel
-        id: deploy_vercel
-        run: echo "url=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})" > $GITHUB_OUTPUT
         
-      - name: Retrieve Vercel Preview URL
-        id: vercel_preview_url
-        uses: actions/github-script@v3
-        with:
-          script: |
-            const preview_url = `steps.deploy_vercel.outputs.url`
+#       - name: Deploy artifacts to Vercel
+#         id: deploy_vercel
+#         run: echo "url=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})" > $GITHUB_OUTPUT
+        
+#       - name: Retrieve Vercel Preview URL
+#         id: vercel_preview_url
+#         uses: actions/github-script@v3
+#         with:
+#           script: |
+#             const preview_url = `steps.deploy_vercel.outputs.url`
 
-            const comment = [
-              '| Name | Preview |',
-              '| :--- | :------ |',
-              `| **deriv-app**  | [Visit Preview](${preview_url}) |`,
-              ''
-            ].join('\n')
-            core.setOutput("comment", comment);
+#             const comment = [
+#               '| Name | Preview |',
+#               '| :--- | :------ |',
+#               `| **deriv-app**  | [Visit Preview](${preview_url}) |`,
+#               ''
+#             ].join('\n')
+#             core.setOutput("comment", comment);
 
-      - name: Post Vercel Preview comment
-        uses: marocchino/sticky-pull-request-comment@v2
-        with:
-          header: Vercel Preview Comment
-          number: ${{github.event.issue.number}}
-          message: ${{steps.vercel_preview_url.outputs.comment}}
+#       - name: Post Vercel Preview comment
+#         uses: marocchino/sticky-pull-request-comment@v2
+#         with:
+#           header: Vercel Preview Comment
+#           number: ${{github.event.issue.number}}
+#           message: ${{steps.vercel_preview_url.outputs.comment}}
