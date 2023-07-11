@@ -22,6 +22,15 @@ jobs:
       - name: Build project
         run: npm build
         
+      - name: Publish to Cloudflare Pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: YOUR_ACCOUNT_ID
+          projectName: YOUR_PROJECT_NAME
+          directory: public
+          wranglerVersion: '3'
+        
 #       - name: Deploy artifacts to Vercel
 #         id: deploy_vercel
 #         run: echo "url=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})" > $GITHUB_OUTPUT
