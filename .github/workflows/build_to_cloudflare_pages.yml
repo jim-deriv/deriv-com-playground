@@ -26,8 +26,8 @@ jobs:
         uses: cloudflare/pages-action@v1
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: YOUR_ACCOUNT_ID
-          projectName: YOUR_PROJECT_NAME
+          accountId: ${{ secrets.ACCOUNT_ID }}
+          projectName: deriv-com-playground
           directory: public
           wranglerVersion: '3'
         
