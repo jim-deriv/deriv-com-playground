@@ -33,49 +33,33 @@ jobs:
           echo "Installing Wrangler CLI"
           npm i -g wrangler
           
+          echo "Deploying build to Cloudflare Pages"
           directory='public'
           projectName='deriv-com-playground'
-          branch=${{ github.ref }}
-          
+          branch=$GITHUB_HEAD_REF
           preview_url=$(wrangler pages deploy $directory --project-name=$projectName --branch=$branch | grep -o 'https://[^\"]*.pages.dev')
           
+          echo "Retrieving preview URL"
           echo "preview_url=$preview_url" >> "$GITHUB_OUTPUT"
-          
-      - name: Get output
-        run: |
-          echo "Preview URL: ${{ steps.publish_to_pages.outputs.preview_url }}"
-          
-#         uses: cloudflare/pages-action@v1
-#         with:
-#           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-#           accountId: ${{ secrets.ACCOUNT_ID }}
-#           projectName: deriv-com-playground
-#           directory: public
-#           wranglerVersion: '3'
-
         
-#       - name: Deploy artifacts to Vercel
-#         id: deploy_vercel
-#         run: echo "url=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})" > $GITHUB_OUTPUT
-        
-#       - name: Retrieve Vercel Preview URL
-#         id: vercel_preview_url
-#         uses: actions/github-script@v3
-#         with:
-#           script: |
-#             const preview_url = `steps.deploy_vercel.outputs.url`
+      - name: Retrieve Vercel Preview URL
+        id: vercel_preview_url
+        uses: actions/github-script@v3
+        with:
+          script: |
+            const preview_url = `steps.publish_to_pages.outputs.preview_url`
 
-#             const comment = [
-#               '| Name | Preview |',
-#               '| :--- | :------ |',
-#               `| **deriv-app**  | [Visit Preview](${preview_url}) |`,
-#               ''
-#             ].join('\n')
-#             core.setOutput("comment", comment);
+            const comment = [
+              '| Name | Result |',
+              '| :--- | :------ |',
+              `| **Preview URL**  | [Visit Preview](${preview_url}) |`,
+              ''
+            ].join('\n')
+            core.setOutput("comment", comment);
 
-#       - name: Post Vercel Preview comment
-#         uses: marocchino/sticky-pull-request-comment@v2
-#         with:
-#           header: Vercel Preview Comment
-#           number: ${{github.event.issue.number}}
-#           message: ${{steps.vercel_preview_url.outputs.comment}}
+      - name: Post Vercel Preview comment
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: Vercel Preview Comment
+          number: ${{github.event.issue.number}}
+          message: ${{steps.vercel_preview_url.outputs.comment}}
