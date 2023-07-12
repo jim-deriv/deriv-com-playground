@@ -42,12 +42,12 @@ jobs:
           echo "Retrieving preview URL"
           echo "preview_url=$preview_url" >> "$GITHUB_OUTPUT"
         
-      - name: Retrieve Vercel Preview URL
+      - name: Retrieve Cloudflare Pages Preview URL
         id: vercel_preview_url
         uses: actions/github-script@v3
         with:
           script: |
-            const preview_url = `steps.publish_to_pages.outputs.preview_url`
+            const preview_url = ${{ steps.publish_to_pages.outputs.preview_url }} 
 
             const comment = [
               '| Name | Result |',
@@ -57,7 +57,7 @@ jobs:
             ].join('\n')
             core.setOutput("comment", comment);
 
-      - name: Post Vercel Preview comment
+      - name: Post Cloudflare Pages Preview comment
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           header: Vercel Preview Comment
