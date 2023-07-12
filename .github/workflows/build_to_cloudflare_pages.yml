@@ -26,6 +26,7 @@ jobs:
         run: npm run build
         
       - name: Publish to Cloudflare Pages
+        id: publish_to_pages
         uses: cloudflare/pages-action@v1
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -33,6 +34,9 @@ jobs:
           projectName: deriv-com-playground
           directory: public
           wranglerVersion: '3'
+      - name: Get output
+        run: |
+          echo ${{ steps.publish_to_pages.outputs.stdout }}
         
 #       - name: Deploy artifacts to Vercel
 #         id: deploy_vercel
