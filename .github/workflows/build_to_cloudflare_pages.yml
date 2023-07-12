@@ -9,7 +9,7 @@ on:
 env:
    NODE_OPTIONS: "--max-old-space-size=8192"
    CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-   CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+   CLOUDFLARE_ACCOUNT_ID: ${{ secrets.ACCOUNT_ID }}
 
 jobs:
   build_to_cloudflare_pages:
@@ -37,7 +37,7 @@ jobs:
           projectName='deriv-com-playground'
           branch=${{ github.ref }}
           
-          preview_url=$(wrangler pages publish $directory --project-name=$projectName --branch=$branch | grep -o 'https://[^\"]*')
+          preview_url=$(wrangler pages deploy $directory --project-name=$projectName --branch=$branch | grep -o 'https://[^\"]*.pages.dev')
           
           echo "preview_url=$preview_url" >> "$GITHUB_OUTPUT"
           
