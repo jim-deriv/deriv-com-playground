@@ -45,36 +45,31 @@ jobs:
                   ${{ runner.os }}-build-${{ env.cache-name }}-
                   ${{ runner.os }}-build-
                   ${{ runner.os }}-
-
             - name: Install dependencies
               if: ${{ steps.cache-npm.outputs.cache-hit != 'true' }}
               run: npm ci
 
             - name: Build project
-              run: npm run build:incremental
+              run: npm run build
 
             - name: Publish to Cloudflare Pages
               id: publish_to_pages
               run: |
                   echo "Installing Wrangler CLI"
                   npm i -g wrangler
-
                   echo "Deploying build to Cloudflare Pages"
                   directory='public'
                   projectName='deriv-com-playground'
                   branch=$GITHUB_HEAD_REF
                   preview_url=$(wrangler pages deploy $directory --project-name=$projectName --branch=$branch | grep -o 'https://[^\"]*.pages.dev')
-
                   echo "Retrieving preview URL"
                   echo "preview_url=$preview_url" >> "$GITHUB_OUTPUT"
-
             - name: Retrieve Cloudflare Pages Preview URL
               id: vercel_preview_url
               uses: actions/github-script@v3
               with:
                   script: |
                       const preview_url = '${{ steps.publish_to_pages.outputs.preview_url }}'
-
                       const comment = [
                         '| Name | Result |',
                         '| :--- | :------ |',
@@ -82,7 +77,6 @@ jobs:
                         ''
                       ].join('\n')
                       core.setOutput("comment", comment);
-
             - name: Post Cloudflare Pages Preview comment
               uses: marocchino/sticky-pull-request-comment@v2
               with:
