@@ -132,7 +132,7 @@ const BeSquareBanner = () => {
                         <StyledText>
                             Are you a go-getter who loves learning and taking on new challenges?
                             Then apply for the Deriv graduate programme to start an exciting journey
-                            that will transform your professional life!
+                            that will transform your professional life!!!
                         </StyledText>
                         <StyledLinkButton
                             secondary
