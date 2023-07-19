@@ -51,7 +51,7 @@ jobs:
               run: npm ci
 
             - name: Build project
-              run: npm run build:incremental
+              run: npm run build
 
             - name: Publish to Cloudflare Pages
               id: publish_to_pages
