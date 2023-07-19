@@ -21,13 +21,19 @@ jobs:
             - name: Setup node
               uses: actions/setup-node@v2
 
-            - name: Get cached artifact
+            - name: Get .cache folder
               uses: actions/cache@v3
               with:
-                  key: gatsby-public-folder
+                key: ${{ runner.os }}-cache-${{ env.cache-name }}
+                path: .cache
+                
+            - name: Get cached build
+              uses: actions/cache@v3
+              with:
+                  key: ${{ runner.os }}-public-${{ env.cache-name }}
                   path: public
           
-            - name: Cache node modules
+            - name: Get cached dependencies
               id: cache-npm
               uses: actions/cache@v3
               env:
