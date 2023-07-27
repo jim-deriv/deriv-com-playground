@@ -26,18 +26,16 @@ jobs:
               uses: actions/setup-node@v2
 
             - name: Get cached build output
-              uses: actions/cache@v3
+              uses: actions/cache/restore@v3
               with:
-                key: ${{ runner.os }}-cache-public
+                key: master-cache-public
                 path: |
                     .cache
                     public
           
             - name: Get cached dependencies
               id: cache-npm
-              uses: actions/cache@v3
-              env:
-                cache-name: cache-node-modules
+              uses: actions/cache/restore@v3
               with:
                 path: node_modules
                 key: ${{ runner.os }}-build-${{ hashFiles('**/package-lock.json') }}
