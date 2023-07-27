@@ -52,9 +52,9 @@ jobs:
 
             - name: Save master cache
             - uses: actions/cache/save@v3
-                  with:
-                    key: master-cache-public
-                    path: |
-                      .cache
-                      public
+              with:
+                  key: master-cache-public
+                  path: |
+                    .cache
+                    public
 
