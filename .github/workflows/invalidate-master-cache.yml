@@ -1,4 +1,4 @@
-name: Validate master cache
+name: Invalidate master cache
 
 permissions: write-all
 
@@ -11,7 +11,7 @@ env:
     NODE_OPTIONS: '--max-old-space-size=8192'
 
 concurrency:
-    group: validate-master-cache
+    group: invalidate-master-cache
     cancel-in-progress: true
 
 jobs:
@@ -50,7 +50,7 @@ jobs:
                   path: node_modules
                   key: master-npm-${{ hashFiles('**/package-lock.json') }}
 
-            - name: Build project
+            - name: Rebuild master cache
               run: npm run build
 
             - name: Save master cache
