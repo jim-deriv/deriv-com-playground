@@ -5,7 +5,7 @@ permissions: write-all
 on:
     pull_request:
         types: [opened, synchronize]
-        
+
 env:
     NODE_OPTIONS: '--max-old-space-size=8192'
     CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -25,21 +25,21 @@ jobs:
             - name: Setup node
               uses: actions/setup-node@v2
 
-            - name: Get cached build output
+            - name: Get build output from master cache
               uses: actions/cache/restore@v3
               with:
-                key: master-cache-public
-                path: |
-                    .cache
-                    public
-          
+                  key: master-cache-public
+                  path: |
+                      .cache
+                      public
+
             - name: Get cached dependencies
               id: cache-npm
               uses: actions/cache/restore@v3
               with:
-                path: node_modules
-                key: ${{ runner.os }}-build-${{ hashFiles('**/package-lock.json') }}
-  
+                  path: node_modules
+                  key: master-npm-${{ hashFiles('**/package-lock.json') }}
+
             - name: Install dependencies
               if: ${{ steps.cache-npm.outputs.cache-hit != 'true' }}
               run: npm ci
@@ -52,13 +52,13 @@ jobs:
               run: |
                   echo "Installing Wrangler CLI"
                   npm i -g wrangler
-                  
+
                   echo "Deploying build to Cloudflare Pages"
                   directory='public'
                   projectName='deriv-com-playground'
                   branch=$GITHUB_HEAD_REF
                   preview_url=$(wrangler pages deploy $directory --project-name=$projectName --branch=$branch | grep -o 'https://[^\"]*.pages.dev')
-              
+
             - name: Retrieve Cloudflare Pages Preview URL
               id: vercel_preview_url
               uses: actions/github-script@v3
@@ -68,15 +68,14 @@ jobs:
                       const comment = [
                         '| Name | Result |',
                         '| :--- | :------ |',
-                        `| **Preview URL**  | [Visit Preview](${preview_url}) |`,
+                        `| **Preview URL**  | [Visit Link](${preview_url}) |`,
                         ''
                       ].join('\n')
                       core.setOutput("comment", comment);
-                      
+
             - name: Post Cloudflare Pages Preview comment
               uses: marocchino/sticky-pull-request-comment@v2
               with:
                   header: Vercel Preview Comment
                   number: ${{github.event.issue.number}}
                   message: ${{steps.vercel_preview_url.outputs.comment}}
-
