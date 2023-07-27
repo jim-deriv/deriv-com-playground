@@ -12,7 +12,7 @@ env:
     CLOUDFLARE_ACCOUNT_ID: ${{ secrets.ACCOUNT_ID }}
 
 concurrency:
-    group: ${{ github.head_ref }}
+    group: cloudflare-pages-build-${{ github.head_ref }}
     cancel-in-progress: true
 
 jobs:
