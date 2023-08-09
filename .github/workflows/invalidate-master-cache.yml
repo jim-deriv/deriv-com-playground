@@ -73,7 +73,7 @@ jobs:
                       public
                       
             - name: Clear master cache on build failure
-              if: ${{ failure() || cancelled() }}
+              if: ${{ (failure() || cancelled()) && steps.restore_master_cache.outputs.cache-hit == 'true' }}
               run: |
                   owner="adrienne-deriv"
                   repo="deriv-com-playground"
