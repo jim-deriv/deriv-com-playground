@@ -6,9 +6,6 @@ on:
     schedule:
       - cron: '0 4 * * *'
     workflow_dispatch:
-    push:
-        branches:
-            - 'master'
 
 env:
     NODE_OPTIONS: '--max-old-space-size=8192'
@@ -74,7 +71,7 @@ jobs:
 
             - name: Backup master cache
               if: ${{ success() }}
-              uses: action/cache/save@v3
+              uses: actions/cache/save@v3
               with:
                   key: master-cache-public-replica
                   path: |
