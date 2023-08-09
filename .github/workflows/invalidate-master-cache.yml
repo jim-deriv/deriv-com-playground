@@ -61,7 +61,7 @@ jobs:
               run: npm run build
 
             - name: Save master cache
-              if: ${{ always() && steps.build_cache.outcome == 'success' }}
+              if: ${{ success() }}
               uses: actions/cache/save@v3
               with:
                   key: master-cache-public
