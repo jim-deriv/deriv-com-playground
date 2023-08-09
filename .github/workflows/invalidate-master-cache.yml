@@ -69,23 +69,23 @@ jobs:
                       .cache
                       public
 
-            - name: Backup master cache
-              if: ${{ always() && steps.build_cache.outcome == 'success' }}
-              uses: actions/cache/save@v3
-              with:
-                  key: master-cache-public-replica
-                  path: |
-                      .cache
-                      public
+            # - name: Backup master cache
+            #   if: ${{ always() && steps.build_cache.outcome == 'success' }}
+            #   uses: actions/cache/save@v3
+            #   with:
+            #       key: master-cache-public-replica
+            #       path: |
+            #           .cache
+            #           public
                       
-            - name: Clear master cache on build failure
-              if: ${{ (failure() || cancelled()) && steps.restore_master_cache.outputs.cache-hit == 'true' }}
-              run: |
-                  owner="adrienne-deriv"
-                  repo="deriv-com-playground"
-                  cache_key="${{ steps.restore_master_cache.outputs.cache-matched-key }}"
-                  curl \
-                    -X DELETE \
-                    -H "Accept: application/vnd.github.v3+json" \
-                    -H "Authorization: token ${{ github.token }}" \
-                    https://api.github.com/repos/$owner/$repo/actions/caches?key=$cache_key
+            # - name: Clear master cache on build failure
+            #   if: ${{ (failure() || cancelled()) && steps.restore_master_cache.outputs.cache-hit == 'true' }}
+            #   run: |
+            #       owner="adrienne-deriv"
+            #       repo="deriv-com-playground"
+            #       cache_key="${{ steps.restore_master_cache.outputs.cache-matched-key }}"
+            #       curl \
+            #         -X DELETE \
+            #         -H "Accept: application/vnd.github.v3+json" \
+            #         -H "Authorization: token ${{ github.token }}" \
+            #         https://api.github.com/repos/$owner/$repo/actions/caches?key=$cache_key
