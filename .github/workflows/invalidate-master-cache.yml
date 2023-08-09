@@ -71,6 +71,15 @@ jobs:
                   path: |
                       .cache
                       public
+
+            - name: Backup master cache
+              if: ${{ success() }}
+              uses: action/cache/save@v3
+              with:
+                  key: master-cache-public-replica
+                  path: |
+                      .cache
+                      public
                       
             - name: Clear master cache on build failure
               if: ${{ (failure() || cancelled()) && steps.restore_master_cache.outputs.cache-hit == 'true' }}
