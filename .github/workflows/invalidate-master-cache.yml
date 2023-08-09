@@ -61,22 +61,13 @@ jobs:
               run: npm run build
 
             - name: Save master cache
-              if: ${{ success() }}
+              if: ${{ always() && steps.build_cache.outcome == 'success' }}
               uses: actions/cache/save@v3
               with:
                   key: master-cache-public
                   path: |
                       .cache
                       public
-
-            # - name: Backup master cache
-            #   if: ${{ always() && steps.build_cache.outcome == 'success' }}
-            #   uses: actions/cache/save@v3
-            #   with:
-            #       key: master-cache-public-replica
-            #       path: |
-            #           .cache
-            #           public
                       
             # - name: Clear master cache on build failure
             #   if: ${{ (failure() || cancelled()) && steps.restore_master_cache.outputs.cache-hit == 'true' }}
