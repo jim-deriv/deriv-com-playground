@@ -24,16 +24,16 @@ jobs:
             - name: Setup node
               uses: actions/setup-node@v2
 
-            - name: Get master cache
-              id: restore_master_cache
-              uses: actions/cache/restore@v3
-              with:
-                  key: master-cache-public
-                  restore-keys: |
-                      master-cache-replica
-                  path: |
-                      .cache
-                      public
+            - name: Clear master cache
+              run: |
+                  owner="adrienne-deriv"
+                  repo="deriv-com-playground"
+                  cache_key="${{ steps.restore_master_cache.outputs.cache-matched-key }}"
+                  curl \
+                    -X DELETE \
+                    -H "Accept: application/vnd.github.v3+json" \
+                    -H "Authorization: token ${{ github.token }}" \
+                    https://api.github.com/repos/$owner/$repo/actions/caches?key=$cache_key
 
             - name: Get dependencies key
               id: dependency_key
@@ -71,14 +71,3 @@ jobs:
                       .cache
                       public
                       
-            # - name: Clear master cache on build failure
-            #   if: ${{ (failure() || cancelled()) && steps.restore_master_cache.outputs.cache-hit == 'true' }}
-            #   run: |
-            #       owner="adrienne-deriv"
-            #       repo="deriv-com-playground"
-            #       cache_key="${{ steps.restore_master_cache.outputs.cache-matched-key }}"
-            #       curl \
-            #         -X DELETE \
-            #         -H "Accept: application/vnd.github.v3+json" \
-            #         -H "Authorization: token ${{ github.token }}" \
-            #         https://api.github.com/repos/$owner/$repo/actions/caches?key=$cache_key
