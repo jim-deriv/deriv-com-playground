@@ -75,6 +75,18 @@ jobs:
                   path: |
                       .cache
                       public
+          
+            - name: Clear backup cache
+              if: ${{ steps.restore-master-cache.outputs.cache-hit == 'true' && steps.build-cache.outcome == 'success' }}
+              run: |
+                  owner="adrienne-deriv"
+                  repo="deriv-com-playground"
+                  cache_key="master-cache-public-replica"
+                  curl \
+                    -X DELETE \
+                    -H "Accept: application/vnd.github.v3+json" \
+                    -H "Authorization: token ${{ github.token }}" \
+                    https://api.github.com/repos/$owner/$repo/actions/caches?key=$cache_key
                       
             - name: Sync backup cache
               if: ${{ steps.build-cache.outcome == 'success' }}
