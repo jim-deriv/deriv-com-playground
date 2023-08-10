@@ -1,6 +1,8 @@
 name: Invalidate master cache
 
-permissions: write-all
+permissions:
+    actions: write
+    contents: read
 
 on:
     schedule:
