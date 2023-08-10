@@ -33,9 +33,7 @@ const HomePage = () => {
             />
             <MainNav />
             <HomeHero />
-            <LivePricing />
-            <TradeTypes />
-            <OurPlatforms />
+            <LivePrici
             <ClientTestimonial />
             {is_p2p_allowed_country && <P2PBanner />}
             <SignupPublic />
