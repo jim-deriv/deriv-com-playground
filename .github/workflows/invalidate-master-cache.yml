@@ -77,7 +77,7 @@ jobs:
                       public
           
             - name: Clear backup cache
-              if: ${{ steps.restore-master-cache.outputs.cache-hit == 'true' && steps.build-cache.outcome == 'success' }}
+              if: ${{ steps.build-cache.outcome == 'success' }}
               run: |
                   owner="adrienne-deriv"
                   repo="deriv-com-playground"
