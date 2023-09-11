@@ -1,6 +1,12 @@
 name: Build to Cloudflare Pages
 
-permissions: write-all
+permissions:
+  actions: write
+  checks: write
+  contents: write
+  deployments: write
+  pull-requests: write
+  statuses: write
 
 on:
     pull_request:
@@ -8,8 +14,6 @@ on:
 
 env:
     NODE_OPTIONS: '--max-old-space-size=8192'
-    CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-    CLOUDFLARE_ACCOUNT_ID: ${{ secrets.ACCOUNT_ID }}
 
 concurrency:
     group: cloudflare-pages-build-${{ github.head_ref }}
@@ -17,7 +21,7 @@ concurrency:
 
 jobs:
     build_to_cloudflare_pages:
-        runs-on: ubuntu-latest
+        runs-on: Ubuntu-latest
         steps:
             - name: Checkout to repo
               uses: actions/checkout@v3
@@ -32,7 +36,7 @@ jobs:
               uses: actions/github-script@v3
               with:
                   script: |
-                      const preview_url = "${{ github.head_ref }}" + ".deriv-com-playground.pages.dev"
+                      const preview_url = "https://" + "${{ github.head_ref }}" + ".deriv-com-preview-links.pages.dev"
                       const comment = [
                         '## Cloudflare Pages Preview link',
                         '| Name | Result |',
@@ -42,7 +46,6 @@ jobs:
                         ''
                       ].join('\n')
                       core.setOutput("comment", comment);
-
             - name: Update build status comment
               uses: marocchino/sticky-pull-request-comment@v2
               with:
@@ -60,7 +63,6 @@ jobs:
                   path: |
                       .cache
                       public
-
             - name: Get cached dependencies
               id: cache-npm
               uses: actions/cache/restore@v3
@@ -75,24 +77,16 @@ jobs:
             - name: Build project
               id: build-project
               run: npm run build
-
+            
             - name: Publish to Cloudflare Pages
-              id: publish-to-pages
-              run: |
-                  echo "Installing Wrangler CLI"
-                  npm i -g wrangler
-
-                  echo "Deploying build to Cloudflare Pages"
-                  directory='public'
-                  projectName='deriv-com-playground'
-                  branch=$GITHUB_HEAD_REF
-
-                  preview_url=$(wrangler pages deploy $directory --project-name=$projectName --branch=$branch > log.txt 2>&1; echo $?)
-                  echo "------"
-                  cat log.txt
-
-                  echo "preview_url=$branch.deriv-com-playground.pages.dev" > "$GITHUB_OUTPUT"
-
+              uses: cloudflare/wrangler-action@2.0.0
+              
+              with:
+                apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+                accountId: ${{ secrets.ACCOUNT_ID }}
+                command: pages publish public --project-name=deriv-com --branch=${GITHUB_REF_NAME}
+                         echo "preview_url=$(pages info --project-name=deriv-com-preview-links --branch=${GITHUB_REF_NAME} --format preview_url)" >> $GITHUB_OUTPUT
+            
             - name: Retrieve Cloudflare Pages Preview URL
               id: cloudflare_pages_preview_url
               uses: actions/github-script@v3
@@ -100,7 +94,6 @@ jobs:
                   script: |
                       const preview_url = "${{ steps.publish-to-pages.outputs.preview_url }}"
                       const comment = [
-                        '## Cloudflare Pages Preview link',
                         '| Name | Result |',
                         '| :--- | :------ |',
                         `| **Build status**  | Completed ✅ |`,
@@ -108,7 +101,6 @@ jobs:
                         ''
                       ].join('\n')
                       core.setOutput("comment", comment);
-
             - name: Post Cloudflare Pages Preview comment
               uses: marocchino/sticky-pull-request-comment@v2
               with:
