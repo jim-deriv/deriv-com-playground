@@ -1,12 +1,12 @@
 name: Build to Cloudflare Pages
 
 permissions:
-  actions: write
-  checks: write
-  contents: write
-  deployments: write
-  pull-requests: write
-  statuses: write
+    actions: write
+    checks: write
+    contents: write
+    deployments: write
+    pull-requests: write
+    statuses: write
 
 on:
     pull_request:
@@ -36,7 +36,7 @@ jobs:
               uses: actions/github-script@v3
               with:
                   script: |
-                      const preview_url = "https://" + "${{ github.head_ref }}" + ".deriv-com-preview-links.pages.dev"
+                      const preview_url = "https://" + "${{ github.head_ref }}" + ".deriv-com-test-links.pages.dev"
                       const comment = [
                         '## Cloudflare Pages Preview link',
                         '| Name | Result |',
@@ -46,6 +46,7 @@ jobs:
                         ''
                       ].join('\n')
                       core.setOutput("comment", comment);
+
             - name: Update build status comment
               uses: marocchino/sticky-pull-request-comment@v2
               with:
@@ -63,6 +64,7 @@ jobs:
                   path: |
                       .cache
                       public
+
             - name: Get cached dependencies
               id: cache-npm
               uses: actions/cache/restore@v3
@@ -77,33 +79,9 @@ jobs:
             - name: Build project
               id: build-project
               run: npm run build
-            
-            - name: Publish to Cloudflare Pages
-              uses: cloudflare/wrangler-action@2.0.0
-              
+
+            - name: Upload build artifact
+              uses: actions/upload-artifact@v2
               with:
-                apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-                accountId: ${{ secrets.ACCOUNT_ID }}
-                command: pages publish public --project-name=deriv-com --branch=${GITHUB_REF_NAME}
-                         echo "preview_url=$(pages info --project-name=deriv-com-preview-links --branch=${GITHUB_REF_NAME} --format preview_url)" >> $GITHUB_OUTPUT
-            
-            - name: Retrieve Cloudflare Pages Preview URL
-              id: cloudflare_pages_preview_url
-              uses: actions/github-script@v3
-              with:
-                  script: |
-                      const preview_url = "${{ steps.publish-to-pages.outputs.preview_url }}"
-                      const comment = [
-                        '| Name | Result |',
-                        '| :--- | :------ |',
-                        `| **Build status**  | Completed ✅ |`,
-                        `| **Preview URL**  | [Visit Preview](${preview_url}) |`,
-                        ''
-                      ].join('\n')
-                      core.setOutput("comment", comment);
-            - name: Post Cloudflare Pages Preview comment
-              uses: marocchino/sticky-pull-request-comment@v2
-              with:
-                  header: Cloudflare Pages Preview Comment
-                  number: ${{github.event.issue.number}}
-                  message: ${{steps.cloudflare_pages_preview_url.outputs.comment}}
+                  name: build-${{ github.head_ref }}
+                  path: .
