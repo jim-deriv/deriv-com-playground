@@ -143,10 +143,7 @@ jobs:
               uses: actions/github-script@v3
               with:
                   github-token: ${{ github.token }}
-                  script: |
-                      var fs = require('fs');
-                      var issue_number = Number(fs.readFileSync('./NR'));
-                                            
+                  script: |              
                       const preview_url = `https://${{github.event.workflow_run.head_branch}}.deriv-com-preview-links.pages.dev`
                       const comment = [
                           `**Preview Link**: ${preview_url}`,
@@ -157,11 +154,10 @@ jobs:
                           ''
                         ].join('\n')
                       core.setOutput("comment", comment);
-                      core.setOutput("issue_number", issue_number)
 
             - name: Post Cloudflare Pages Preview comment
               uses: marocchino/sticky-pull-request-comment@v2
               with:
                   header: Cloudflare Pages Preview Comment
-                  number: ${{steps.generate_preview_url.outputs.issue_number}}
+                  number: ${{steps.update_preview_url.outputs.issue_number}}
                   message: ${{steps.generate_preview_url.outputs.comment}}
