@@ -30,8 +30,8 @@ jobs:
         steps:
             - name: 'Echo stuff'
               run: |
-                  echo ${{ github.event.workflow_run.pull_requests }}[0].head.ref
-                  echo ${{ github.event.workflow_run.pull_requests }}[0].head.sha
+                  echo "${{ github.event.workflow_run.pull_requests }}[0].head.ref"
+                  echo "${{ github.event.workflow_run.pull_requests[0].head.sha }}"
                   echo ${{ github.event.workflow_run.pull_requests }}[0].number
 
             - name: 'Download artifact'
