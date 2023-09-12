@@ -31,53 +31,53 @@ jobs:
             - name: 'Download artifact'
               uses: actions/github-script@v3.1.0
               with:
-                script: |
-                  var artifacts = await github.actions.listWorkflowRunArtifacts({
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    run_id: ${{github.event.workflow_run.id }},
-                  });
-                  var matchArtifact = artifacts.data.artifacts.filter((artifact) => {
-                    return artifact.name == `pr-${{ github.event.workflow_run.id }}`
-                  })[0];
-                  var download = await github.actions.downloadArtifact({
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    artifact_id: matchArtifact.id,
-                    archive_format: 'zip',
-                  });
-                  var fs = require('fs');
-                  fs.writeFileSync('${{github.workspace}}/pr.zip', Buffer.from(download.data));
+                  script: |
+                      var artifacts = await github.actions.listWorkflowRunArtifacts({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        run_id: ${{github.event.workflow_run.id }},
+                      });
+                      var matchArtifact = artifacts.data.artifacts.filter((artifact) => {
+                        return artifact.name == `pr-${{ github.event.workflow_run.id }}`
+                      })[0];
+                      var download = await github.actions.downloadArtifact({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        artifact_id: matchArtifact.id,
+                        archive_format: 'zip',
+                      });
+                      var fs = require('fs');
+                      fs.writeFileSync('${{github.workspace}}/pr.zip', Buffer.from(download.data));
 
             - run: unzip pr.zip
-    
-            - name: 'Generate preview link comment'
-              id: cloudflare_pages_preview_url
+
+            - name: 'Updte preview link build status'
+              id: update_preview_url
               uses: actions/github-script@v3
               with:
-                github-token: ${{ github.token }}
-                script: |
-                  var fs = require('fs');
-                  var issue_number = Number(fs.readFileSync('./NR'));
-                                        
-                  const preview_url = `https://${{github.event.workflow_run.head_branch}}.deriv-com-preview-links.pages.dev`
-                  const comment = [
-                      `**Preview Link**: ${preview_url}`,
-                      '| Name | Result |',
-                      '| :--- | :------ |',
-                      `| **Build status**  | Completed ✅ |`,
-                      `| **Preview URL**  | [Visit Preview](${preview_url}) |`,
-                      ''
-                    ].join('\n')
-                  core.setOutput("comment", comment);
-                  core.setOutput("issue_number", issue_number)
+                  github-token: ${{ github.token }}
+                  script: |
+                      var fs = require('fs');
+                      var issue_number = Number(fs.readFileSync('./NR'));
+                                            
+                      const preview_url = `https://${{github.event.workflow_run.head_branch}}.deriv-com-preview-links.pages.dev`
+                      const comment = [
+                          `**Preview Link**: ${preview_url}`,
+                          '| Name | Result |',
+                          '| :--- | :------ |',
+                          `| **Build status**  | Building ⏳ |`,
+                          `| **Preview URL**  | [Visit Preview](${preview_url}) |`,
+                          ''
+                        ].join('\n')
+                      core.setOutput("comment", comment);
+                      core.setOutput("issue_number", issue_number)
 
             - name: Post Cloudflare Pages Preview comment
               uses: marocchino/sticky-pull-request-comment@v2
               with:
                   header: Cloudflare Pages Preview Comment
-                  number: ${{steps.cloudflare_pages_preview_url.outputs.issue_number}}
-                  message: ${{steps.cloudflare_pages_preview_url.outputs.comment}}
+                  number: ${{steps.update_preview_url.outputs.issue_number}}
+                  message: ${{steps.update_preview_url.outputs.comment}}
 
             - name: Checkout to repo
               uses: actions/checkout@v3
@@ -137,3 +137,31 @@ jobs:
                     echo "Deployment to Cloudflare Pages failed."
                     exit 1
                   fi
+
+            - name: 'Generate preview link comment'
+              id: generate_preview_url
+              uses: actions/github-script@v3
+              with:
+                  github-token: ${{ github.token }}
+                  script: |
+                      var fs = require('fs');
+                      var issue_number = Number(fs.readFileSync('./NR'));
+                                            
+                      const preview_url = `https://${{github.event.workflow_run.head_branch}}.deriv-com-preview-links.pages.dev`
+                      const comment = [
+                          `**Preview Link**: ${preview_url}`,
+                          '| Name | Result |',
+                          '| :--- | :------ |',
+                          `| **Build status**  | Completed ✅ |`,
+                          `| **Preview URL**  | [Visit Preview](${preview_url}) |`,
+                          ''
+                        ].join('\n')
+                      core.setOutput("comment", comment);
+                      core.setOutput("issue_number", issue_number)
+
+            - name: Post Cloudflare Pages Preview comment
+              uses: marocchino/sticky-pull-request-comment@v2
+              with:
+                  header: Cloudflare Pages Preview Comment
+                  number: ${{steps.generate_preview_url.outputs.issue_number}}
+                  message: ${{steps.generate_preview_url.outputs.comment}}
