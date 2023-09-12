@@ -32,7 +32,7 @@ jobs:
               run: |
                   echo "${{ github.event.workflow_run.pull_requests }}[0].head.ref"
                   echo "${{ github.event.workflow_run.pull_requests[0].head.sha }}"
-                  echo ${{ github.event.workflow_run.pull_requests }}[0].number
+                  echo "${{ github.event.workflow_run.pull_requests }}"[0].number
 
             - name: 'Download artifact'
               uses: actions/github-script@v3.1.0
@@ -43,15 +43,18 @@ jobs:
                         repo: context.repo.repo,
                         run_id: ${{github.event.workflow_run.id }},
                       });
+                      
                       var matchArtifact = artifacts.data.artifacts.filter((artifact) => {
                         return artifact.name == `pr-${{ github.event.workflow_run.id }}`
                       })[0];
+                    
                       var download = await github.actions.downloadArtifact({
                         owner: context.repo.owner,
                         repo: context.repo.repo,
                         artifact_id: matchArtifact.id,
                         archive_format: 'zip',
                       });
+
                       var fs = require('fs');
                       fs.writeFileSync('${{github.workspace}}/pr.zip', Buffer.from(download.data));
 
