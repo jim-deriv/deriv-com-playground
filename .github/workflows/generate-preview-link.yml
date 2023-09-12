@@ -30,9 +30,9 @@ jobs:
         steps:
             - name: 'Echo stuff'
               run: |
-                  echo "${{ toJson(github.event.workflow_run.pull_requests) }}[0].head.ref"
-                  echo "${{ toJson(github.event.workflow_run.pull_requests[0].head.sha) }}"
-                  echo "${{ toJson(github.event.workflow_run.pull_requests) }}"[0].number
+                  echo "First Pull Request Number: ${{ github.event.workflow_run.pull_requests[0].number }}"
+                  echo "First Pull Request Title: ${{ github.event.workflow_run.pull_requests[0].title }}"
+                  echo "First Pull Request URL: ${{ github.event.workflow_run.pull_requests[0].url }}"
 
             - name: 'Download artifact'
               uses: actions/github-script@v3.1.0
