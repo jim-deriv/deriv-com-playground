@@ -20,7 +20,7 @@ jobs:
               if: github.event.action == 'opened'
               uses: jamessingleton/is-organization-member@v1
               with:
-                organization: testorg
+                organization: binary-com
                 username: ${{ github.event.pull_request.assignee.login }}
                 token: ${{ github.token }}
                 
