@@ -42,7 +42,7 @@ jobs:
                         return artifact.name == `pr-${{ github.event.workflow_run.id }}`
                       })[0];
                     
-                      var download = await github.actions.downloadArtifact({
+                      var download = await github.rest.actions.downloadArtifact({
                         owner: context.repo.owner,
                         repo: context.repo.repo,
                         artifact_id: matchArtifact.id,
