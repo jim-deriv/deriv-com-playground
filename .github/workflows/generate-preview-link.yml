@@ -35,39 +35,6 @@ jobs:
                   workflow_conclusion: success
                   run_id: ${{ github.event.workflow_run.id }}
                   name: "pr-${{ github.event.workflow_run.id }}"
-                  
-            # - uses: actions/download-artifact@v3
-            #   with:
-            #     name: "pr-${{ github.event.workflow_run.id }}"
-            # - name: 'Download artifact'
-            #   uses: actions/github-script@v6.4.1
-            #   with:
-            #       script: |
-            #           var artifacts = await github.rest.actions.listWorkflowRunArtifacts({
-            #             owner: context.repo.owner,
-            #             repo: context.repo.repo,
-            #             run_id: ${{github.event.workflow_run.id }},
-            #           });
-                      
-            #           var matchArtifact = artifacts.data.artifacts.filter((artifact) => {
-            #             return artifact.name == `pr-${{ github.event.workflow_run.id }}`
-            #           })[0];
-
-            #           if (matchArtifact[0]) {
-            #               var download = await github.rest.actions.downloadArtifact({
-            #                 owner: context.repo.owner,
-            #                 repo: context.repo.repo,
-            #                 artifact_id: matchArtifact.id,
-            #                 archive_format: 'zip',
-            #               });
-    
-            #               var fs = require('fs');
-            #               fs.writeFileSync('${{github.workspace}}/pr.zip', Buffer.from(download.data));
-            #           } else {
-            #               throw new Error('PR information artifact not found.')
-            #           }
-
-            # - run: unzip "pr-${{ github.event.workflow_run.id }}".zip
 
             - name: Retrieve assignee information
               id: is_organization_member
@@ -83,7 +50,7 @@ jobs:
                   fi
                 
             - name: Check assignee organization
-              if: steps.is_organization_member.outputs.result == false
+              if: ${{ steps.is_organization_member.outputs.result == 'false' }}
               run: |
                   echo "User does not belong to binary-com organization."
                   exit 1
