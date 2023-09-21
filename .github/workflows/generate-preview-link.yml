@@ -28,9 +28,17 @@ jobs:
             github.event.workflow_run.event == 'pull_request' &&
             github.event.workflow_run.conclusion == 'success'
         steps:
-            - uses: actions/download-artifact@v3
+            - name: Download artifact
+              id: download-artifact
+              uses: dawidd6/action-download-artifact@v2
               with:
-                name: "pr-${{ github.event.workflow_run.id }}"
+                  workflow_conclusion: success
+                  run_id: ${{ github.event.workflow_run.id }}
+                  name: "pr-${{ github.event.workflow_run.id }}"
+                  
+            # - uses: actions/download-artifact@v3
+            #   with:
+            #     name: "pr-${{ github.event.workflow_run.id }}"
             # - name: 'Download artifact'
             #   uses: actions/github-script@v6.4.1
             #   with:
