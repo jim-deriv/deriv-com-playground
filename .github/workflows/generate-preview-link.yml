@@ -67,7 +67,7 @@ jobs:
             #               throw new Error('PR information artifact not found.')
             #           }
 
-            # - run: unzip pr.zip
+            - run: unzip "pr-${{ github.event.workflow_run.id }}".zip
 
             - name: Retrieve assignee information
               id: is_organization_member
