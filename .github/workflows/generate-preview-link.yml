@@ -55,7 +55,7 @@ jobs:
                   echo "User does not belong to binary-com organization."
                   exit 1
 
-            - name: 'Updte preview link build status'
+            - name: 'Update preview link build status'
               id: update_preview_url
               uses: actions/github-script@v3
               with:
