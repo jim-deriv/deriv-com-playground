@@ -3,4 +3,4 @@ importScripts(
     'https://cdn.pushwoosh.com/webpush/v3/pushwoosh-service-worker.js' + self.location.search,
 )
 
-const x = 123456
+const x = 1234567
